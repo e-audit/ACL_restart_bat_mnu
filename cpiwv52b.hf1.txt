@@ -1,0 +1,19 @@
+﻿
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+#
+# Initial commit
+#
+# Changes to be committed:
+#   (use "git rm --cached <file>..." to unstage)
+#
+#	new file:   .gitattributes
+#	new file:   .gitignore
+#	new file:   C_DRIVE.FIL
+#	new file:   Erling_Petersen_DK.ACL
+#	new file:   Erling_Petersen_DK.LIX
+#	new file:   e_audit_DEL_GetACLandTableInfo.BAT
+#	new file:   e_audit_GetACLandTableInfo.BAT
+#
+

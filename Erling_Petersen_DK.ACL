@@ -1,0 +1,156 @@
+@ACL1000
+^LAYOUT   C_DRIVE                            316 D.T,
+FILE_NAME      ASCII       1 256   AS "FileName" WIDTH 35  
+FILE_SIZE      ACL       257  12 0 AS "File;Size" WIDTH 16  
+FILE_ATTRIBUTES ASCII     269   6   AS "Attributes"  
+FILE_CREATE_DATE DATETIME  275   8   PICTURE "YYYYMMDD" AS "Create;Date"  
+FILE_CREATE_TIME DATETIME  283   6   PICTURE "hhmmss" AS "Create;Time" WIDTH 14  
+FILE_ACCESS_DATE DATETIME  289   8   PICTURE "YYYYMMDD" AS "Access;Date"  
+FILE_ACCESS_TIME DATETIME  297   6   PICTURE "hhmmss" AS "Access;Time" WIDTH 14  
+FILE_WRITE_DATE DATETIME  303   8   PICTURE "YYYYMMDD" AS "Modified;Date"  
+FILE_WRITE_TIME DATETIME  311   6   PICTURE "hhmmss" AS "Modified;Time" WIDTH 14  
+^LOGFILE  Erling_Petersen_DK                  "" "Erling_Petersen_DK.LOG"
+[PARENT_FOLDER_ID] 0
+^REPORT   Default_View                       C_DRIVE                          D.T,
+[SKIP] 0
+[TLINES] 0
+[RLINES] 1
+[LINE] 1
+FILE_NAME            PICTURE ""
+[LINE] 1
+FILE_SIZE            PICTURE ""
+[LINE] 1
+FILE_ATTRIBUTES      WIDTH 10 PICTURE ""
+[LINE] 1
+FILE_CREATE_DATE     PICTURE ""
+[LINE] 1
+FILE_CREATE_TIME     PICTURE ""
+[LINE] 1
+FILE_ACCESS_DATE     PICTURE ""
+[LINE] 1
+FILE_ACCESS_TIME     PICTURE ""
+[LINE] 1
+FILE_WRITE_DATE      PICTURE ""
+[LINE] 1
+FILE_WRITE_TIME      PICTURE ""
+^BATCH    A_MUG_FOR_ME                       
+[PARENT_FOLDER_ID] 0
+COMMENT 
+*************************************** GENEREL INFORMATION ABOUT THE SCRIPT ********************************
+* 
+ Description:   The script is an example on how to use the EXECUTE command in ACL Analytics
+*
+ Version:       ACL Analytics 10.0
+*
+Purpose:        The purpose of the script is:
+                - creating a simple and an ACL usefull script example on how to use the EXECUTE command.
+                - get automatic access under Applications to batches and menu files created in a script.
+*  
+Script info:    1. Read ACL enviroment information with the script Func_v_GetACLandTableInfo
+                2. Create a DOS batch file "Restart_project.bat"
+                3. Create an ACL script file "Find_all_exe_files.bat" - example
+                4. Create an ACL menu file "My_Menu.MNU" - example
+                5. Automatic restart the project to get access to the ACL script from the menu file under Applications
+*
+ Preconditions: An open table.
+                Access to the scripts:
+                - e_audit_GetACLandTableInfo.BAT
+                - e_audit_DEL_GetACLandTableInfo.BAT
+*
+ Input:         Screen dialog.
+                - Open a table if not already open.
+*
+ Output:        A DOS batch file called "Restart_project.bat". The bacth file restart the ACL project.
+                A new menu called "My_Menu.mnu".
+                A new ACL script called "Find_all_exe_files.bat". 
+                The ACL script can be called from the the menu "My_Menu" under Applications.
+*
+ Date:          Developed: 2013-07-17
+*
+ Version:       1.0
+*
+ Developer:     Contact person: Erling T Petersen, Denmark, erling.petersen@skat.dk
+*
+ Copyright:     It is permissible to copy all or parts of the script, if you send an email to 
+                erling.petersen@skat.dk. It's free.
+                Please send an email to erling.petersen@skat.dk if you use the script, or have 
+                suggestions for improvement. 
+                It's nice to know if the script is being used.
+*
+*****************************************************************************************************************
+END
+
+SET ECHO NONE
+SET SAFETY OFF
+
+
+COMMENT ---- BEGIN ----- Get enviroment information from the ACL project -----------------------------------------
+DO SCRIPT e_audit_GetACLandTableInfo
+
+SET ECHO NONE
+SET SAFETY OFF
+
+v_OpenProjectNameAc=ALLTRIM(REPLACE(v_GetOpenProjectName '.ACL' '.AC'))
+COMMENT ---- END ------- Get enviroment information from the ACL project -----------------------------------------
+
+
+COMMENT ---- BEGIN ----- Create the batch to restart your ACL project --------------------------------------------
+EXPORT '@ECHO OFF                                                   ' FIRST 1 TO Restart_project.bat
+EXPORT 'cd "%v_GetOpenProjectPath%"                                 ' FIRST 1 TO Restart_project.bat APPEND
+EXPORT ':ACL_OPEN                                                   ' FIRST 1 TO Restart_project.bat APPEND
+EXPORT 'IF EXIST "%v_OpenProjectNameAc%" GOTO Wait_a_second         ' FIRST 1 TO Restart_project.bat APPEND
+EXPORT '"%v_GetOpenProjectName%"                                    ' FIRST 1 TO Restart_project.bat APPEND
+EXPORT 'GOTO End_batch                                              ' FIRST 1 TO Restart_project.bat APPEND
+EXPORT ':Wait_a_second                                              ' FIRST 1 TO Restart_project.bat APPEND
+EXPORT ' ping 127.0.0.1 > nul                                       ' FIRST 1 TO Restart_project.bat APPEND
+EXPORT ' GOTO ACL_OPEN                                              ' FIRST 1 TO Restart_project.bat APPEND
+EXPORT ':End_batch                                                  ' FIRST 1 TO Restart_project.bat APPEND
+COMMENT ---- END ------- Create the batch to restart your ACL project --------------------------------------------
+
+
+COMMENT ---- BEGIN ----- Create your script files (.bat) and menu files (.mnu) here ----- Example ----------------
+
+COMMENT --- BEGIN ---- Create script - Find_all_exe_files ------------------
+EXPORT 'SET ECHO NONE                                                  ' FIRST 1 TO Find_all_exe_files.bat
+EXPORT 'SET SAFETY OFF                                                 ' FIRST 1 TO Find_all_exe_files.bat APPEND
+EXPORT 'DELETE SCRIPT Find_all_exe_files OK                            ' FIRST 1 TO Find_all_exe_files.bat APPEND
+EXPORT 'DIR C:\*.EXE SUB TO ALL_MY_EXE_FILES                           ' FIRST 1 TO Find_all_exe_files.bat APPEND
+EXPORT 'OPEN ALL_MY_EXE_FILES                                          ' FIRST 1 TO Find_all_exe_files.bat APPEND
+EXPORT 'SET SAFETY ON                                                  ' FIRST 1 TO Find_all_exe_files.bat APPEND
+EXPORT 'SET ECHO ON                                                    ' FIRST 1 TO Find_all_exe_files.bat APPEND
+COMMENT --- END ------ Create script - Find_all_exe_files ------------------
+
+
+COMMENT --- BEGIN ---- Create mnu file - My_menu ---------------------------
+EXPORT 'MAIN MENU                           2                                    .' FIRST 1 TO My_Menu.MNU
+EXPORT 'Find all exe files on C drive       DO SCRIPT Find_all_exe_files         .' FIRST 1 TO My_Menu.MNU APPEND
+EXPORT 'Quit ACL                            QUIT                                 .' FIRST 1 TO My_Menu.MNU APPEND
+COMMENT --- END ------ Create mnu file - My_menu ---------------------------
+
+COMMENT ---- END ------- Create your script files (.bat) and menu files (.mnu) here ----- Example ----------------
+
+
+COMMENT ---- BEGIN ----- Information to the user -----------------------------------------------------------------
+PAUSE "ACL stops and starts again. After the restart you will have access to your created menu under Applications"
+COMMENT ---- END ------- Information to the user -----------------------------------------------------------------
+
+
+COMMENT ---- BEGIN ----- Run the Restart_project batch fil created above with the EXECUTE command ----------------
+EXECUTE 'cmd /c "%v_GetOpenProjectPath%Restart_project.bat"' ASYNC
+COMMENT ---- END ------- Run the Restart_project batch fil created above with the EXECUTE command ----------------
+
+
+COMMENT ---- BEGIN ----- Clean up -----------------------------------------
+DELETE v_OpenProjectNameAc OK
+DO SCRIPT e_audit_DEL_GetACLandTableInfo
+COMMENT ---- END ----- Clean up -----------------------------------------
+
+SET SAFETY ON
+SET ECHO ON
+
+QUIT
+^FORMAT   C_DRIVE                            C_DRIVE                          "" "C_DRIVE.FIL" 0 ASCII 
+[PARENT_FOLDER_ID] 0
+~.07/17/2013   12:41:51   dir c:\*.* to C_DRIVE
+[LASTVIEW] "Default_View"
+^OPEN 
